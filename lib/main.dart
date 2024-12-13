@@ -1,28 +1,46 @@
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(GameWidget(game: SpaceShooterGame()));
 }
 
-class Player extends PositionComponent {
-  static final _paint = Paint()..color = Colors.white;
+class SpaceShooterGame extends FlameGame with PanDetector {
+  late Player player;
+
   @override
-  void render(Canvas canvas) {
-    canvas.drawRect(size.toRect(), _paint);
+  Future<void> onLoad() async {
+    player = Player();
+    add(player);
+  }
+
+  @override
+  void onPanUpdate(DragUpdateInfo info) {
+    player.move(info.delta.global);
   }
 }
 
-class SpaceShooterGame extends FlameGame {
+class Player extends SpriteComponent with HasGameReference<SpaceShooterGame> {
+  Player()
+      : super(
+          size: Vector2(100, 150),
+          anchor: Anchor.center,
+        );
+
   @override
   Future<void> onLoad() async {
-    add(
-      Player()
-        ..position = size / 2
-        ..width = 50
-        ..height = 100
-        ..anchor = Anchor.center,
-    );
+    await super.onLoad();
+
+    sprite = await game.loadSprite('player-sprite.png');
+
+    position = game.size / 2;
+    anchor = Anchor.center;
+  }
+
+  void move(Vector2 delta) {
+    position.add(delta);
   }
 }
