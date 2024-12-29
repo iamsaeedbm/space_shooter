@@ -1,46 +1,27 @@
-import 'package:flame/components.dart';
-import 'package:flame/events.dart';
+import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
+import 'package:space_shooter/game_manager.dart';
 
 void main() {
-  runApp(GameWidget(game: SpaceShooterGame()));
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Flame.device.fullScreen();
+  // Flame.device.setLandscape();
+
+  runApp(const MainApp());
 }
 
-class SpaceShooterGame extends FlameGame with PanDetector {
-  late Player player;
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
-  Future<void> onLoad() async {
-    player = Player();
-    add(player);
-  }
-
-  @override
-  void onPanUpdate(DragUpdateInfo info) {
-    player.move(info.delta.global);
-  }
-}
-
-class Player extends SpriteComponent with HasGameReference<SpaceShooterGame> {
-  Player()
-      : super(
-          size: Vector2(100, 150),
-          anchor: Anchor.center,
-        );
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-
-    sprite = await game.loadSprite('player-sprite.png');
-
-    position = game.size / 2;
-    anchor = Anchor.center;
-  }
-
-  void move(Vector2 delta) {
-    position.add(delta);
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Space shooter',
+        debugShowCheckedModeBanner: false,
+        home: GameWidget(
+          game: GameManager(),
+        ));
   }
 }
